@@ -6,9 +6,12 @@ services:
     volumes:
       - ./configuration/chirpstack:/etc/chirpstack
     depends_on:
-      - postgres
-      - mosquitto
-      - redis
+      postgres:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+      redis:
+        condition: service_started
     environment:
       - MQTT_BROKER_HOST=mosquitto
       - REDIS_HOST=redis
@@ -60,6 +63,11 @@ services:
       - POSTGRES_USER=chirpstack
       - POSTGRES_PASSWORD=chirpstack
       - POSTGRES_DB=chirpstack
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chirpstack -d chirpstack"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
 
   redis:
     image: redis:7-alpine
@@ -74,7 +82,7 @@ services:
     ports:
       - "1883:1883"
     volumes: 
-      - ./configuration/mosquitto/config/:/mosquitto/config/
+      - ./configuration/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
 volumes:
   postgresqldata:
