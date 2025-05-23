@@ -16,6 +16,7 @@ services:
       - MQTT_BROKER_HOST=mosquitto
       - REDIS_HOST=redis
       - POSTGRESQL_HOST=postgres
+      - RABBITMQ_URL=${RABBITMQ_URL}
     ports:
       - "8089:8080"
 
